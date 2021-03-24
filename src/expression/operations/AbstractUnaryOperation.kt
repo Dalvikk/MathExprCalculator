@@ -17,3 +17,4 @@ abstract class AbstractUnaryOperation(private val term: GenericExpression, priva
         return "($operationToken$term)"
     }
 }
+

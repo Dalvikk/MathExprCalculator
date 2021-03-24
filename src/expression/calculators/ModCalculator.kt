@@ -53,3 +53,4 @@ class ModCalculator : IntCalculator() {
         for (i in 2 until MOD) inverses[i] = (MOD - MOD / i * inverses[MOD % i] % MOD) % MOD
     }
 }
+

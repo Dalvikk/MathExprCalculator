@@ -16,7 +16,7 @@ abstract class BaseParser {
     }
 
     protected val next: Char
-        protected get() {
+    get() {
             if (buffer.isEmpty()) {
                 readNextFromSource()
             }
