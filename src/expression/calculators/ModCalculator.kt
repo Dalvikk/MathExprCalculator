@@ -4,10 +4,10 @@ import expression.exceptions.DivisionByZeroException
 
 class ModCalculator : IntCalculator() {
     private val inverses = IntArray(MOD)
+
     override fun add(x: Int, y: Int): Int {
         return getByMod(super.add(x, y))
     }
-
 
     override fun sub(x: Int, y: Int): Int {
         return getByMod(super.sub(x, y))
@@ -17,10 +17,9 @@ class ModCalculator : IntCalculator() {
         return getByMod(super.mul(x, y))
     }
 
-    @Throws(DivisionByZeroException::class)
     override fun div(x: Int, y: Int): Int {
         if (y == 0) {
-            throw DivisionByZeroException("Division by zero")
+            throw DivisionByZeroException(x, y)
         }
         return getByMod(mul(x, inverses[y ]))
     }

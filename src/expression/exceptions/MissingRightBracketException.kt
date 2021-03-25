@@ -1,3 +1,3 @@
 package expression.exceptions
 
-class MissingRightBracketException(message: String?) : ParseException(message)
+class MissingRightBracketException(message: String) : ParseException(message)

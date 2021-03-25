@@ -1,3 +1,3 @@
 package expression.exceptions
 
-class ModByZeroException(message: String?) : EvaluateException(message)
+class ModByZeroException(x: Any, y: Any) : EvaluateException("Division by zero. Left term = $x, right term = $y")

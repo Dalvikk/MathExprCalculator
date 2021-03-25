@@ -9,7 +9,7 @@ class Const(private val value: String) : GenericExpression {
         return try {
             calculator.parse(value)
         } catch (ignored: NumberFormatException) {
-            throw OverflowException("Constant overflow")
+            throw OverflowException(value)
         }
     }
 

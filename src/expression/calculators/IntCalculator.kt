@@ -16,10 +16,9 @@ open class IntCalculator : Calculator<Int> {
         return x  * y 
     }
 
-    @Throws(DivisionByZeroException::class)
     override fun div(x: Int, y: Int): Int {
         if (y == 0) {
-            throw DivisionByZeroException("Division vy zero")
+            throw DivisionByZeroException(x, y)
         }
         return x  / y 
     }
@@ -34,7 +33,7 @@ open class IntCalculator : Calculator<Int> {
 
     override fun mod(x: Int, y: Int): Int {
         if (y == 0) {
-            throw ModByZeroException("mod by zero")
+            throw ModByZeroException(x, y)
         }
         return x  % y 
     }

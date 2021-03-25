@@ -17,7 +17,7 @@ class ByteCalculator : Calculator<Byte> {
 
     override fun div(x: Byte, y: Byte): Byte {
         if (y.toInt() == 0) {
-            throw DivisionByZeroException("Division by zero")
+            throw DivisionByZeroException(x, y)
         }
         return (x / y).toByte()
     }
@@ -27,7 +27,7 @@ class ByteCalculator : Calculator<Byte> {
     }
 
     override fun parse(s: String): Byte {
-        return s.toInt().toByte()
+        return s.toByte()
     }
 
     override fun mod(x: Byte, y: Byte): Byte {

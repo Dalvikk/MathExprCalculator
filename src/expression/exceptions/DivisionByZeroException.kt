@@ -1,3 +1,3 @@
 package expression.exceptions
 
-class DivisionByZeroException(message: String?) : EvaluateException(message)
+class DivisionByZeroException(x: Any, y: Any) : EvaluateException("Division by zero. Left term = $x, right term = $y")

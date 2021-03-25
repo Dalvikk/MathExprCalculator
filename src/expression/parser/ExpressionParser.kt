@@ -8,23 +8,15 @@ import expression.exceptions.ParseException
 import expression.operations.*
 
 
-class ExpressionParser : BaseParser() {
-    private var expression: String? = null
-    private fun init(expression: String?) {
-        super.init(StringSource(expression!!))
-        this.expression = expression
-    }
+class ExpressionParser(private val expression: String) : BaseParser(StringSource(expression)) {
 
-    fun parse(expression: String): GenericExpression {
-        init(expression)
+    fun parse(): GenericExpression {
         val result = parseExpression()
         skipWhitespaces()
         return if (!eof()) {
             throw ParseException(
                 MessageCreator.createHighlightMessage(
-                    "Unexpected symbol: $next", expression, readCnt + 1
-                )
-            )
+                    "Unexpected symbol: $next", expression, readCnt + 1))
         } else {
             result
         }
@@ -35,37 +27,32 @@ class ExpressionParser : BaseParser() {
         return parseBinaryTerm(0)
     }
 
-    private fun nextBinaryTerm(priority: Int): GenericExpression {
-        return if (priority == Operation.getPriority(Operation.CONST)) {
-            parseUnary()
-        } else {
-            parseBinaryTerm(priority)
-        }
-    }
-
     private fun parseBinaryTerm(priority: Int): GenericExpression {
-        var result = nextBinaryTerm(priority + 1)
+        if (priority == Operation.getPriority(Operation.CONST)) {
+            return parseUnary()
+        }
+        var result = parseBinaryTerm(priority + 1)
         skipWhitespaces()
         while (true) {
             val operation = getNextOperation(priority) ?: return result
-            val rightTerm = nextBinaryTerm(priority + 1)
+            val rightTerm = parseBinaryTerm(priority + 1)
             result = binaryOperation(operation, result, rightTerm)
             skipWhitespaces()
         }
     }
 
     private fun getNextOperation(priority: Int): Operation? {
-        for (operation in Operation.OPERATIONS_BY_PRIORITIES[priority]) {
-            val op: String? = Operation.STRING_BY_OPERATOR[operation]
+        for (operation in Operation.operationsByPriority[priority]) {
+            val op: String? = Operation.stringByOperator[operation]
             if (op != null && test(op)) {
                 return operation
             }
         }
         if (priority == Operation.getPriority(Operation.CONST)) {
-            if (isNextCharBetween('x', 'z')) {
+            if (next.isLetter()) {
                 return Operation.VAR
             }
-            if (isNextCharBetween('0', '9')) {
+            if (next.isDigit()) {
                 return Operation.CONST
             }
         }
@@ -75,7 +62,7 @@ class ExpressionParser : BaseParser() {
     private fun binaryOperation(
         operation: Operation,
         left: GenericExpression,
-        right: GenericExpression
+        right: GenericExpression,
     ): GenericExpression {
         return when (operation) {
             Operation.ADD -> Add(left, right)
@@ -89,8 +76,7 @@ class ExpressionParser : BaseParser() {
 
     private fun parseUnary(): GenericExpression {
         skipWhitespaces()
-        val operation =
-            getNextOperation(Operation.getPriority(Operation.CONST))
+        val operation = getNextOperation(Operation.getPriority(Operation.CONST))
         if (operation != null) {
             when (operation) {
                 Operation.CONST -> return parseConst(true)
@@ -99,18 +85,19 @@ class ExpressionParser : BaseParser() {
                     val result = parseExpression()
                     skipWhitespaces()
                     if (!test(')')) {
-                        throw MissingRightBracketException("Right bracket missing")
+                        throw MissingRightBracketException("Right bracket missing.")
                     }
                     return result
                 }
-                Operation.RB -> throw MissingLeftBracketException("RB")
+                Operation.RB -> throw MissingLeftBracketException("Left bracket missing.")
                 Operation.NEGATE -> {
-                    return if (isNextCharBetween('0', '9')) {
+                    return if (next.isDigit()) {
                         parseConst(false)
                     } else Negate(parseUnary())
                 }
                 Operation.SQUARE -> return Square(parseUnary())
                 Operation.ABS -> return Abs(parseUnary())
+                else -> throw AssertionError()
             }
         }
         throw ParseException(
@@ -136,7 +123,7 @@ class ExpressionParser : BaseParser() {
         if (!isPositive) {
             sb.append('-')
         }
-        while (isNextCharBetween('0', '9')) {
+        while (next.isDigit()) {
             sb.append(next)
             pop()
         }

@@ -19,7 +19,7 @@ class BigIntCalculator : Calculator<BigInteger> {
 
     override fun div(x: BigInteger, y: BigInteger): BigInteger {
         if (y == BigInteger.ZERO) {
-            throw DivisionByZeroException("Division by 0")
+            throw DivisionByZeroException(x, y)
         }
         return x.divide(y)
     }
@@ -34,7 +34,7 @@ class BigIntCalculator : Calculator<BigInteger> {
 
     override fun mod(x: BigInteger, y: BigInteger): BigInteger {
         if (y == BigInteger.ZERO) {
-            throw ModByZeroException("Mod by zero")
+            throw ModByZeroException(x, y)
         }
         return x.mod(y)
     }

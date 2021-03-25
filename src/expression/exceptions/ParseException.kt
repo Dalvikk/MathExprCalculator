@@ -1,3 +1,3 @@
 package expression.exceptions
 
-open class ParseException(message: String?) : RuntimeException(message)
+open class ParseException(message: String) : RuntimeException(message)

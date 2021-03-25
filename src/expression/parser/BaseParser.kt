@@ -1,35 +1,27 @@
 package expression.parser
 
-import java.util.*
-
-abstract class BaseParser {
+abstract class BaseParser(private val source: CharSource) {
+    private val end = '\u0000'
     private val buffer = ArrayDeque<Char>()
-    private var source: CharSource? = null
     protected var readCnt = 0
-        private set
-
-    fun init(source: CharSource?) {
-        this.source = source
-        readCnt = 0
-        buffer.clear()
-        readNextFromSource()
-    }
 
     protected val next: Char
-    get() {
+        get() {
             if (buffer.isEmpty()) {
                 readNextFromSource()
             }
-            return buffer.peekFirst()
+            return buffer.first()
         }
 
     private fun readNextFromSource() {
-        buffer.addLast(if (source!!.hasNext()) source!!.next() else END)
+        buffer.addLast(if (source.hasNext()) source.next() else end)
     }
 
-    protected fun pop() {
-        buffer.pollFirst()
+    protected fun pop(): Char {
+        readCnt++
+        return buffer.removeFirst()
     }
+
 
     protected fun skipWhitespaces() {
         while (Character.isWhitespace(next)) {
@@ -46,35 +38,21 @@ abstract class BaseParser {
     }
 
     protected fun test(expected: String): Boolean {
-        while (buffer.size <= expected.length) {
+        while (buffer.size < expected.length) {
             readNextFromSource()
         }
-        val it: Iterator<Char> = buffer.iterator()
-        for (element in expected) {
-            if (it.next() != element) {
+        for ((idx, element) in expected.withIndex()) {
+            if (element != buffer[idx]) {
                 return false
             }
         }
-        val lastChar = Character.isLetter(expected[expected.length - 1])
-        val nextChar = Character.isLetter(it.next())
-        if (!(lastChar && nextChar)) {
-            for (i in expected.indices) {
-                pop()
-            }
-            return true
+        for (i in 1..expected.length) {
+            pop()
         }
-        return false
+        return true
     }
 
     protected fun eof(): Boolean {
-        return test(END)
-    }
-
-    protected fun isNextCharBetween(from: Char, to: Char): Boolean {
-        return next in from..to
-    }
-
-    companion object {
-        const val END = '\u0000'
+        return test(end)
     }
 }
