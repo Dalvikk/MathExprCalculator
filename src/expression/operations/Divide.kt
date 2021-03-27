@@ -2,9 +2,11 @@ package expression.operations
 
 import expression.GenericExpression
 import expression.calculators.Calculator
+import expression.parser.Connector
 
-class Divide(first: GenericExpression, second: GenericExpression) : AbstractBinaryOperation(first, second, "/") {
+class Divide(first: GenericExpression, second: GenericExpression, connector: Connector) :
+    AbstractBinaryOperation(first, second, "/", connector) {
     override fun <T> calculate(x: T, y: T, calculator: Calculator<T>): T {
-        return calculator.div(x, y)
+        return calculator.div(x, y, this)
     }
 }

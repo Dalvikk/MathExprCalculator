@@ -1,3 +1,9 @@
 package expression.exceptions
 
-class ModByZeroException(x: Any, y: Any) : ArithmeticException("Division by zero. Left term = $x, right term = $y")
+class ModByZeroException(x: Any, y: Any, expression: String, pos: Int) : ArithmeticException(
+    MessageCreator.createHighlightMessage(
+        "Mod by zero. Left = $x, right = $y.",
+        expression,
+        pos
+    )
+)

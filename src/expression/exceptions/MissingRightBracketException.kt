@@ -1,3 +1,9 @@
 package expression.exceptions
 
-class MissingRightBracketException(message: String) : ParseException(message)
+class MissingRightBracketException(expression: String, pos: Int) : ArithmeticException(
+    MessageCreator.createHighlightMessage(
+        "Right bracket missing",
+        expression,
+        pos
+    )
+)

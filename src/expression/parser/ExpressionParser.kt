@@ -9,6 +9,7 @@ import expression.operations.*
 
 
 class ExpressionParser(private val expression: String) : BaseParser(StringSource(expression)) {
+    private val connector = Connector(expression)
 
     fun parse(): GenericExpression {
         val result = parseExpression()
@@ -16,7 +17,7 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
         return if (!eof()) {
             throw ParseException(
                 MessageCreator.createHighlightMessage(
-                    "Unexpected symbol: $next", expression, readCnt + 1
+                    "Binary operation expected", expression, readCnt + 1
                 )
             )
         } else {
@@ -29,16 +30,24 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
         return parseBinaryTerm(0)
     }
 
-    private fun parseBinaryTerm(priority: Int): GenericExpression {
-        if (priority == Operation.getPriority(Operation.CONST)) {
-            return parseUnary()
+    private fun nextTerm(priority: Int): GenericExpression {
+        return if (priority == Operation.getPriority(Operation.CONST)) {
+            parseUnary()
+        } else {
+            parseBinaryTerm(priority)
         }
-        var result = parseBinaryTerm(priority + 1)
+    }
+
+
+    private fun parseBinaryTerm(priority: Int): GenericExpression {
+        var result = nextTerm(priority + 1)
         skipWhitespaces()
         while (true) {
+            val operationPos = readCnt + 1
             val operation = getNextOperation(priority) ?: return result
-            val rightTerm = parseBinaryTerm(priority + 1)
+            val rightTerm = nextTerm(priority + 1)
             result = binaryOperation(operation, result, rightTerm)
+            connector.insert(result, operationPos)
             skipWhitespaces()
         }
     }
@@ -67,50 +76,51 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
         right: GenericExpression,
     ): GenericExpression {
         return when (operation) {
-            Operation.ADD -> Add(left, right)
-            Operation.SUB -> Subtract(left, right)
-            Operation.MUL -> Multiply(left, right)
-            Operation.DIV -> Divide(left, right)
-            Operation.MOD -> Mod(left, right)
-            else -> throw AssertionError("Unknown operation:$operation")
+            Operation.ADD -> Add(left, right, connector)
+            Operation.SUB -> Subtract(left, right, connector)
+            Operation.MUL -> Multiply(left, right, connector)
+            Operation.DIV -> Divide(left, right, connector)
+            Operation.MOD -> Mod(left, right, connector)
+            else -> throw AssertionError("This code shouldn't have executed. An error has occurred, please contact the developer")
         }
     }
 
     private fun parseUnary(): GenericExpression {
         skipWhitespaces()
+        val operationPos = readCnt + 1
+        var ans: GenericExpression? = null
         val operation = getNextOperation(Operation.getPriority(Operation.CONST))
         if (operation != null) {
-            when (operation) {
-                Operation.CONST -> return parseConst(true)
-                Operation.VAR -> return parseVariable()
+            ans = when (operation) {
+                Operation.CONST -> parseConst()
+                Operation.VAR -> parseVariable()
                 Operation.LB -> {
                     val result = parseExpression()
                     skipWhitespaces()
                     if (!test(')')) {
-                        throw MissingRightBracketException("Right bracket missing.")
+                        throw MissingRightBracketException(expression, operationPos)
                     }
-                    return result
+                    result
                 }
-                Operation.RB -> throw MissingLeftBracketException("Left bracket missing.")
-                Operation.NEGATE -> {
-                    return if (next.isDigit()) {
-                        parseConst(false)
-                    } else {
-                        Negate(parseUnary())
-                    }
-                }
-                Operation.SQUARE -> return Square(parseUnary())
-                Operation.ABS -> return Abs(parseUnary())
-                else -> throw AssertionError()
+                Operation.RB -> throw MissingLeftBracketException(expression, operationPos)
+                Operation.NEGATE -> Negate(parseUnary(), connector)
+                Operation.SQUARE -> Square(parseUnary(), connector)
+                Operation.ABS -> Abs(parseUnary(), connector)
+                else -> throw AssertionError("This code shouldn't have executed. An error has occurred, please contact the developer")
             }
         }
-        throw ParseException(
-            MessageCreator.createHighlightMessage(
-                "Unexpected symbol: $next",
-                expression,
-                readCnt + 1
+        if (ans == null) {
+            throw ParseException(
+                MessageCreator.createHighlightMessage(
+                    "Const, variable, '(' or unary operation expected:",
+                    expression,
+                    readCnt + 1
+                )
             )
-        )
+        } else if (operation != Operation.LB) {
+            connector.insert(ans, operationPos)
+        }
+        return ans
     }
 
     private fun parseVariable(): Variable {
@@ -119,18 +129,15 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
             sb.append(next)
             pop()
         }
-        return Variable(sb.toString())
+        return Variable(sb.toString(), connector)
     }
 
-    private fun parseConst(isPositive: Boolean): Const {
+    private fun parseConst(): Const {
         val sb = StringBuilder()
-        if (!isPositive) {
-            sb.append('-')
-        }
         while (next.isDigit()) {
             sb.append(next)
             pop()
         }
-        return Const(sb.toString())
+        return Const(sb.toString(), connector)
     }
 }

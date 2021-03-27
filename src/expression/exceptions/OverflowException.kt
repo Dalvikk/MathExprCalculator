@@ -1,3 +1,3 @@
 package expression.exceptions
 
-class OverflowException(vararg a: Any) : ArithmeticException("Overflow. Term(s) = $a")
+class OverflowException(message: String) : ArithmeticException(message)

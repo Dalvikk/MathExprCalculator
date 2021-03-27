@@ -1,16 +1,11 @@
 package expression.operations
 
-import expression.GenericExpression
 import expression.calculators.Calculator
-import expression.exceptions.OverflowException
+import expression.parser.Connector
 
-class Const(private val value: String) : GenericExpression {
+class Const(private val value: String, connector: Connector) : AbstractNAryOperation(connector) {
     override fun <T> evaluate(x: T, y: T, z: T, calculator: Calculator<T>): T {
-        return try {
-            calculator.parse(value)
-        } catch (ignored: NumberFormatException) {
-            throw OverflowException(value)
-        }
+        return calculator.parse(value, this)
     }
 
     override fun toString(): String {

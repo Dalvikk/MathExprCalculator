@@ -2,12 +2,14 @@ package expression.operations
 
 import expression.GenericExpression
 import expression.calculators.Calculator
+import expression.parser.Connector
 
 abstract class AbstractBinaryOperation(
     private val first: GenericExpression,
     private val second: GenericExpression,
     private val operationToken: String,
-) : GenericExpression {
+    connector: Connector
+) : AbstractNAryOperation(connector) {
 
     protected abstract fun <T> calculate(x: T, y: T, calculator: Calculator<T>): T
 
