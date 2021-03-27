@@ -10,6 +10,7 @@ import expression.operations.*
 
 class ExpressionParser(private val expression: String) : BaseParser(StringSource(expression)) {
     private val connector = Connector(expression)
+    private val variables = LinkedHashSet<String>()
 
     fun parse(): GenericExpression {
         val result = parseExpression()
@@ -129,6 +130,7 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
             sb.append(next)
             pop()
         }
+        variables.add(sb.toString())
         return Variable(sb.toString(), connector)
     }
 
@@ -139,5 +141,9 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
             pop()
         }
         return Const(sb.toString(), connector)
+    }
+
+    fun getVariables(): Set<String> {
+        return variables
     }
 }

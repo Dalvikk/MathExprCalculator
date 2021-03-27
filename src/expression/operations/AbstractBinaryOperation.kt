@@ -13,11 +13,11 @@ abstract class AbstractBinaryOperation(
 
     protected abstract fun <T> calculate(x: T, y: T, calculator: Calculator<T>): T
 
-    override fun <T> evaluate(x: T, y: T, z: T, calculator: Calculator<T>): T {
-        return calculate(first.evaluate(x, y, z, calculator), second.evaluate(x, y, z, calculator), calculator)
+    override fun <T> evaluate(variables: Map<String, String>, calculator: Calculator<T>): T {
+        return calculate(first.evaluate(variables, calculator), second.evaluate(variables, calculator), calculator)
     }
 
     override fun toString(): String {
-        return "($first $operationToken $second)"
+        return "($first) $operationToken ($second)"
     }
 }

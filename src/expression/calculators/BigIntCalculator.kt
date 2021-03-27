@@ -3,36 +3,34 @@ package expression.calculators
 import expression.exceptions.DivisionByZeroException
 import expression.exceptions.MessageCreator
 import expression.exceptions.ModByZeroException
-import expression.operations.AbstractBinaryOperation
-import expression.operations.AbstractUnaryOperation
-import expression.operations.Const
+import expression.operations.AbstractNAryOperation
 import java.math.BigInteger
 
 class BigIntCalculator : Calculator<BigInteger> {
-    override fun add(x: BigInteger, y: BigInteger, wrapper: AbstractBinaryOperation): BigInteger {
+    override fun add(x: BigInteger, y: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         return x.add(y)
     }
 
-    override fun sub(x: BigInteger, y: BigInteger, wrapper: AbstractBinaryOperation): BigInteger {
+    override fun sub(x: BigInteger, y: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         return x.subtract(y)
     }
 
-    override fun mul(x: BigInteger, y: BigInteger, wrapper: AbstractBinaryOperation): BigInteger {
+    override fun mul(x: BigInteger, y: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         return x.multiply(y)
     }
 
-    override fun div(x: BigInteger, y: BigInteger, wrapper: AbstractBinaryOperation): BigInteger {
+    override fun div(x: BigInteger, y: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         if (y == BigInteger.ZERO) {
             throw DivisionByZeroException(x, y, wrapper.getExpression(), wrapper.getPos())
         }
         return x.divide(y)
     }
 
-    override fun neg(x: BigInteger, wrapper: AbstractUnaryOperation): BigInteger {
+    override fun neg(x: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         return x.negate()
     }
 
-    override fun parse(s: String, wrapper: Const): BigInteger {
+    override fun parse(s: String, wrapper: AbstractNAryOperation): BigInteger {
         try {
             return BigInteger(s)
         } catch (ignored: NumberFormatException) {
@@ -46,7 +44,7 @@ class BigIntCalculator : Calculator<BigInteger> {
         }
     }
 
-    override fun mod(x: BigInteger, y: BigInteger, wrapper: AbstractBinaryOperation): BigInteger {
+    override fun mod(x: BigInteger, y: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         if (y == BigInteger.ZERO) {
             throw ModByZeroException(x, y, wrapper.getExpression(), wrapper.getPos())
         }
@@ -62,11 +60,11 @@ class BigIntCalculator : Calculator<BigInteger> {
         return x.mod(y)
     }
 
-    override fun abs(x: BigInteger, wrapper: AbstractUnaryOperation): BigInteger {
+    override fun abs(x: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         return x.abs()
     }
 
-    override fun square(x: BigInteger, wrapper: AbstractUnaryOperation): BigInteger {
+    override fun square(x: BigInteger, wrapper: AbstractNAryOperation): BigInteger {
         return x.multiply(x)
     }
 }

@@ -1,28 +1,25 @@
 package expression.operations
 
 import expression.calculators.Calculator
-import expression.exceptions.ParseException
+import expression.exceptions.MessageCreator
 import expression.parser.Connector
 
-class Variable(name: String, connector: Connector) : AbstractNAryOperation(connector) {
-    private val name: String
-    override fun <T> evaluate(x: T, y: T, z: T, calculator: Calculator<T>): T {
-        when (name) {
-            "x" -> return x
-            "y" -> return y
-            "z" -> return z
+class Variable(private val name: String, connector: Connector) : AbstractNAryOperation(connector) {
+    override fun <T> evaluate(variables: Map<String, String>, calculator: Calculator<T>): T {
+        val res = variables[name]
+        if (res != null) {
+            return calculator.parse(res, this)
         }
-        throw AssertionError("This code shouldn't have executed. An error has occurred, please contact the developer")
+        throw RuntimeException(
+            MessageCreator.createHighlightMessage(
+                "Variable's value not found: $name",
+                getExpression(),
+                getPos()
+            )
+        )
     }
 
     override fun toString(): String {
-        return name
-    }
-
-    init {
-        if (name != "x" && name != "y" && name != "z") {
-            throw ParseException("Incorrect variable name: $name. Supports: x, y, z")
-        }
-        this.name = name
+        return "($name)"
     }
 }

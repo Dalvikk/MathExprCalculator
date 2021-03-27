@@ -9,10 +9,12 @@ fun main() {
     val result: GenericExpression
     try {
         result = parser.parse()
-        val x = readLine()!!.toInt()
-        val y = readLine()!!.toInt()
-        val z = readLine()!!.toInt()
-        print(result.evaluate(x, y, z, CheckedIntCalculator()))
+        val map = HashMap<String, String>()
+        for (variable in parser.getVariables()) {
+            println("Enter $variable value:")
+            map[variable] = readLine()!!
+        }
+        print(result.evaluate(map, CheckedIntCalculator()))
     } catch (e: ParseException) {
         print(e.message)
     } catch (e: ArithmeticException) {
