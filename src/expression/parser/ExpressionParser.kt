@@ -16,7 +16,9 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
         return if (!eof()) {
             throw ParseException(
                 MessageCreator.createHighlightMessage(
-                    "Unexpected symbol: $next", expression, readCnt + 1))
+                    "Unexpected symbol: $next", expression, readCnt + 1
+                )
+            )
         } else {
             result
         }
@@ -93,7 +95,9 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
                 Operation.NEGATE -> {
                     return if (next.isDigit()) {
                         parseConst(false)
-                    } else Negate(parseUnary())
+                    } else {
+                        Negate(parseUnary())
+                    }
                 }
                 Operation.SQUARE -> return Square(parseUnary())
                 Operation.ABS -> return Abs(parseUnary())
