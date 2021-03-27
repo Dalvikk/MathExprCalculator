@@ -8,9 +8,11 @@ import expression.exceptions.ParseException
 import expression.operations.*
 
 
-class ExpressionParser(private val expression: String) : BaseParser(StringSource(expression)) {
+class ExpressionParser(_expression: String) : BaseParser(StringSource(_expression)) {
+    private val expression = _expression.replace("\t", " ")
     private val connector = Connector(expression)
     private val variables = LinkedHashSet<String>()
+    private var depth = 0
 
     fun parse(): GenericExpression {
         val result = parseExpression()
@@ -18,7 +20,7 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
         return if (!eof()) {
             throw ParseException(
                 MessageCreator.createHighlightMessage(
-                    "Binary operation expected", expression, readCnt + 1
+                    "Expected binary operation or nothing", expression, readCnt + 1
                 )
             )
         } else {
@@ -96,14 +98,16 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
                 Operation.CONST -> parseConst()
                 Operation.VAR -> parseVariable()
                 Operation.LB -> {
+                    depth++
                     val result = parseExpression()
                     skipWhitespaces()
                     if (!test(')')) {
                         throw MissingRightBracketException(expression, operationPos)
                     }
+                    depth--
                     result
                 }
-                Operation.RB -> throw MissingLeftBracketException(expression, operationPos)
+                Operation.RB -> if (depth == 0) throw MissingLeftBracketException(expression, operationPos) else null
                 Operation.NEGATE -> Negate(parseUnary(), connector)
                 Operation.SQUARE -> Square(parseUnary(), connector)
                 Operation.ABS -> Abs(parseUnary(), connector)
@@ -115,7 +119,7 @@ class ExpressionParser(private val expression: String) : BaseParser(StringSource
                 MessageCreator.createHighlightMessage(
                     "Const, variable, '(' or unary operation expected:",
                     expression,
-                    readCnt + 1
+                    operationPos
                 )
             )
         } else if (operation != Operation.LB) {
