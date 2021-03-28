@@ -216,7 +216,7 @@ first + second - third
 =================^====
 
 // Constant overflows in type
-java -jar math.jar
+> java -jar math.jar
 x + 2
 Enter mode:
 i
@@ -227,3 +227,23 @@ NumberFormatException while parsing: 1000000000000000000 isn't a Int
 x + 2
 ^====
 ```
+
+## TODO list
+* Add BigDecimal support
+* Allow variables to contain numbers, but starts with a letter `a1, an, x2`
+* Add VarConst support (`pi = 3,1415926535` by default, `e = 2.71828182846`, etc)
+* Add Double support to the parser (`0.01, 0.0e-2, 1e+2, Infinity, -Infinity, NaN`)
+* More operations
+* Add postfix unary operations (`!`, `!!`)
+* Add assigment operation and interpreter mode  
+  `> S1 = pi * R * l`  
+  `> S2 = pi * R^2  + pi * R * l`   
+  `> l = 5`  
+  `> S1 + S2`  
+  `Enter mode:`  
+  `> d`   
+  `Enter R: `  
+  `> 2`  
+  `result = 75.36`  
+  `> ...`
+  
