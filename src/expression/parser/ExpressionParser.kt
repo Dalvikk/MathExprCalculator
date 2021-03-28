@@ -17,14 +17,17 @@ class ExpressionParser(_expression: String) : BaseParser(StringSource(_expressio
     fun parse(): GenericExpression {
         val result = parseExpression()
         skipWhitespaces()
-        return if (!eof()) {
+        if (eof()) {
+            return result
+        }
+        if (test(Operation.stringByOperator[Operation.RB]!!)) {
+            throw MissingLeftBracketException(expression, readCnt)
+        } else {
             throw ParseException(
                 MessageCreator.createHighlightMessage(
                     "Expected binary operation or nothing", expression, readCnt + 1
                 )
             )
-        } else {
-            result
         }
     }
 
@@ -107,7 +110,7 @@ class ExpressionParser(_expression: String) : BaseParser(StringSource(_expressio
                     depth--
                     result
                 }
-                Operation.RB -> if (depth == 0) throw MissingLeftBracketException(expression, operationPos) else null
+                Operation.RB -> null
                 Operation.NEGATE -> Negate(parseUnary(), connector)
                 Operation.SQUARE -> Square(parseUnary(), connector)
                 Operation.ABS -> Abs(parseUnary(), connector)
