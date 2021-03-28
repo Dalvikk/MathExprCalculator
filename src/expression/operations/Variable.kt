@@ -12,7 +12,7 @@ class Variable(private val name: String, connector: Connector) : AbstractNAryOpe
         }
         throw RuntimeException(
             MessageCreator.createHighlightMessage(
-                "Variable's value not found: $name",
+                "Variable value not found: $name",
                 getExpression(),
                 getPos()
             )

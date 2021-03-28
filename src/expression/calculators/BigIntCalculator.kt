@@ -52,7 +52,7 @@ class BigIntCalculator : Calculator<BigInteger> {
             throw ArithmeticException(
                 MessageCreator.createHighlightMessage(
                     "Mod by negative number. BigInteger's mode always returns a non-negative BigInteger." +
-                            "Maybe you want add 'remainder' operation?" +
+                            "\nMaybe you want add 'remainder' operation?\n" +
                             "Left = $x, right = $y.", wrapper.getExpression(), wrapper.getPos()
                 )
             )
