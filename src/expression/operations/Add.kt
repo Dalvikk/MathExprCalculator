@@ -1,6 +1,5 @@
 package expression.operations
 
-
 import expression.GenericExpression
 import expression.calculators.Calculator
 import expression.parser.Connector

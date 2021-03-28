@@ -9,6 +9,6 @@ class Const(private val value: String, connector: Connector) : AbstractNAryOpera
     }
 
     override fun toString(): String {
-        return "($value)"
+        return value
     }
 }

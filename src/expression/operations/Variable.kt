@@ -20,6 +20,6 @@ class Variable(private val name: String, connector: Connector) : AbstractNAryOpe
     }
 
     override fun toString(): String {
-        return "($name)"
+        return name
     }
 }

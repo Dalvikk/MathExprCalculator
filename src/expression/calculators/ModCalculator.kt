@@ -3,16 +3,19 @@ package expression.calculators
 import expression.exceptions.DivisionByZeroException
 import expression.operations.AbstractNAryOperation
 
-class ModCalculator(private val MOD: Int) : IntCalculator() {
-    private val inverses = IntArray(MOD)
+class ModCalculator : IntCalculator() {
+    private var mod: Int = 1
+    private var inverses = IntArray(mod)
 
-    init {
+    fun setMod(_mod: Int) {
+        mod = _mod
+        inverses = IntArray(mod)
         inverses[1] = 1
-        for (i in 2 until MOD) inverses[i] = (MOD - MOD / i * inverses[MOD % i] % MOD) % MOD
+        for (i in 2 until mod) inverses[i] = (mod - mod / i * inverses[mod % i] % mod) % mod
     }
 
     private fun getByMod(n: Int): Int {
-        return if (n >= 0) n % MOD else MOD + n % MOD
+        return if (n >= 0) n % mod else mod + n % mod
     }
 
     override fun add(x: Int, y: Int, wrapper: AbstractNAryOperation): Int {
