@@ -17,7 +17,8 @@ You can also easily modify the program:
 * Change the priority of operations
 * Add any prefix unary and infix binary operations
 * Add new calculation mode   
-  See the instruction below
+  
+See the [instruction](#modding) below
 
 | Mode | Description |
 | ---------------|----------------|
@@ -147,9 +148,10 @@ hello + bye
   ^=====
   ```
 
-### Evaluates exceptions
+### Calculate exceptions
 
-All evaluates exceptions extends ArithmeticException
+All calculate exceptions extend ArithmeticException
+
 
 #### DivisionByZeroException
 
@@ -227,6 +229,68 @@ NumberFormatException while parsing: 1000000000000000000 isn't a Int
 x + 2
 ^====
 ```
+
+## Modding
+<details>
+  <summary>Operation priority changing</summary>
+
+Suppose you are not satisfied that `mod` priority is higher than `mul`.   
+
+```
+> java -jar math.jar -debug
+10 * 14 mod 5
+DEBUG: (10) * ((14) mod (5))
+Enter mode:
+i
+40
+```
+but you want `0`. Let's change it.   
+Go to `src/expression/operations/Operation.kt`   
+Find the `operationsByPriority` list:
+```kotlin
+val operationsByPriority = listOf(
+  listOf(ADD, SUB),
+  listOf(MUL, DIV),
+  listOf(MOD),
+  listOf(NEGATE, SQUARE, ABS, CONST, VAR, LB, RB)
+)
+```
+Now the priority of `mod` is equal to its index. Let's change the priority from 3 to 2.
+
+```kotlin
+val operationsByPriority = listOf(
+  listOf(ADD, SUB),
+  listOf(MUL, DIV, MOD),
+  listOf(NEGATE, SQUARE, ABS, CONST, VAR, LB, RB)
+)
+```
+Now mod has the same priority as `mul` and `div`. Operations with a higher priority are shifted one value lower accordingly.  
+**Warning!** Unary and 0-ary operations must have maximum priority or things won't work as you expect
+
+
+That's all. Let's compile and check this:
+```
+> java -jar math.jar -debug
+10 * 14 mod 5
+DEBUG: ((10) * (14)) mod (5)
+Enter mode: 
+i
+0
+```
+</details>
+
+<details>
+  <summary>New calculating mode adding [TODO]</summary>
+</details>
+
+<details>
+  <summary>New infix binary operation adding [TODO]</summary>
+</details>
+
+<details>
+  <summary>New prefix unary operation adding [TODO]</summary>
+</details>
+
 
 ## TODO list
 * Add BigDecimal support
