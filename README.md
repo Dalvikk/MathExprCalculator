@@ -280,7 +280,71 @@ i
 </details>
 
 <details>
-  <summary>New calculating mode adding [TODO]</summary>
+  <summary>New calculating mode adding</summary>
+
+  Suppose that you want a new calculation mode.  
+  For example, let's roll back to [this](https://github.com/Dalvikk/MathExprCalculator/tree/4f43c8a44519124313e689d02714e96d58343874) state when BigDecimal wasn't supported and add it.
+  
+  You can see the diff in [BigDecimal added](https://github.com/Dalvikk/MathExprCalculator/commit/4e0fdf92caebb2d9d90361487d922347ee3cbb22) commit and make sure it's easy.
+  
+  Go to `src/expression/calculators/`  
+  Create calculator what you want, in our case `BigDecimalCalculator`, and inherit it from `Calculate<YOUR_TYPE>`
+
+```kotlin
+package expression.calculators
+
+import java.math.BigDecimal
+
+class BigDecimalCalculator : Calculator<BigDecimal> 
+```
+
+Implement all methods (if you don't want or cannot support some operation in your calculator, throw `NotImplementedError`):
+
+```kotlin
+override fun add(x: BigDecimal, y: BigDecimal, wrapper: AbstractNAryOperation): BigDecimal {
+    return x.add(y)
+}
+
+override fun sub(x: BigDecimal, y: BigDecimal, wrapper: AbstractNAryOperation): BigDecimal {
+    return x.subtract(y)
+}
+
+override fun mul(x: BigDecimal, y: BigDecimal, wrapper: AbstractNAryOperation): BigDecimal {
+    return x.multiply(y)
+}
+
+override fun not_implemented(x: BigDecimal, y: BigDecimal, wrapper: AbstractNAryOperation): BigDecimal {
+    throw NotImplementedError("This method isn't implemented for BigDecimal")
+    // or TODO("This method isn't implemented for BigDecimal")
+}
+
+// ...
+```
+
+Go to `src/expression/Main.kt`  
+Find `CALCULATOR_BY_MODE` map and insert your calculator to match the mode:  
+```kotlin
+val CALCULATOR_BY_MODE: Map<String, Calculator<*>> = mapOf(
+    Pair("bi", BigIntCalculator()),
+    Pair("i", CheckedIntCalculator()),
+    Pair("ci", IntCalculator()),
+    Pair("d", DoubleCalculator()),
+    Pair("bd", BigDecimalCalculator()), // +
+    Pair("p", ModCalculator())
+)
+````
+
+Add small improvements:
+```kotlin
+var res = result.evaluate(map, calculator)
+if (res is BigDecimal) {
+    res = res.setScale(50, RoundingMode.HALF_EVEN)
+}
+println(res)
+```
+
+That's all.
+
 </details>
 
 <details>
