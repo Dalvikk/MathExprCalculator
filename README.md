@@ -2,6 +2,34 @@
 
 Easily modifiable recursively mathematical expressions parser and calculator
 
+## Example
+```
+> java -jar math.jar -debug
+first * second mod lol
+DEBUG: (first) * ((second) mod (lol))
+Enter mode:
+i
+Enter first value:
+5
+Enter second value:
+11
+Enter lol value:
+3
+10
+
+> java -jar math.jar
+(first + last)/2 * n
+Enter mode:
+d
+Enter first value:
+1
+Enter last value:
+100
+Enter n value:
+100
+5050.0
+```
+
 ## About
 
 Supported:
@@ -33,7 +61,7 @@ Operation in ascending priority:
 * `ADD, SUB`
 * `MUL, DIV`
 * `MOD`
-* All unary and 0-ary operations`NEGATE, SQUARE, ABS` `CONST, VAR, LB, RB`
+* All unary and 0-ary operations`CONST, VAR, LB, RB, NEGATE, SQUARE, ABS ...`
 
 ## Run
 
@@ -53,37 +81,7 @@ Operation in ascending priority:
 sets priorities
 
 
-## Examples
-```
-> java -jar math.jar -debug
-first * second mod lol
-DEBUG: (first) * ((second) mod (lol))
-Enter mode:
-i
-Enter first value:
-5
-Enter second value:
-11
-Enter lol value:
-3
-10
-```
-
-```
-> java -jar math.jar
-(first + last)/2 * n
-Enter mode:
-d
-Enter first value:
-1
-Enter last value:
-100
-Enter n value:
-100
-5050.0
-```
-
-### Input errors
+## Error processing
 
 ```
 > java -jar math.jar
@@ -106,9 +104,9 @@ hello + bye
 ^==========
 ```
 
-### Parsing errors
+## Parsing errors
 
-#### Common parse exceptions
+### Common parse exceptions
 
   ``` 
   > java -jar math.jar
@@ -126,7 +124,7 @@ hello + bye
   ==^====
   ```
 
-#### MissingLeftBracketException
+### MissingLeftBracketException
 
   ``` 
   > java -jar math.jar
@@ -137,7 +135,7 @@ hello + bye
   ================^
   ```
 
-#### MissingRightBracketException
+### MissingRightBracketException
 
   ``` 
   > java -jar math.jar
@@ -148,12 +146,12 @@ hello + bye
   ^=====
   ```
 
-### Calculate exceptions
+## Calculate exceptions
 
 All calculate exceptions extend ArithmeticException
 
 
-#### DivisionByZeroException
+### DivisionByZeroException
 
 ```
 > java -jar math.jar
@@ -168,7 +166,7 @@ x / (abs -5 - 5)
 ==^=============
 ```
 
-#### ModByZeroException
+### ModByZeroException
 
 ```
 > java -jar math.jar
@@ -183,7 +181,7 @@ x mod (abs -5 - 5)
 ==^===============
 ```
 
-#### ArithmeticException
+### ArithmeticException
 
 ```
 > java -jar math.jar
@@ -357,7 +355,6 @@ That's all.
 
 
 ## TODO list
-* Add BigDecimal support
 * Allow variables to contain numbers, but starts with a letter `a1, an, x2`
 * Add VarConst support (`pi = 3,1415926535` by default, `e = 2.71828182846`, etc)
 * Add Double support to the parser (`0.01, 0.0e-2, 1e+2, Infinity, -Infinity, NaN`)
