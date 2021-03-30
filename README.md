@@ -3,6 +3,7 @@
 Easily modifiable recursively mathematical expressions parser and calculator
 
 ## Example
+
 ```
 > java -jar math.jar -debug
 first * second mod lol
@@ -38,14 +39,14 @@ Supported:
 * Integer values
 * Overflow checks during evaluating
 * Calculations in various modes
-* Any infix binary and prefix unary operators  
+* Any infix binary and prefix unary operators
 
 You can also easily modify the program:
 
 * Change the priority of operations
 * Add any prefix unary and infix binary operations
-* Add new calculation mode   
-  
+* Add new calculation mode
+
 See the [instruction](#modding) below
 
 | Mode | Description |
@@ -54,6 +55,7 @@ See the [instruction](#modding) below
 | `ci`  |Calculations in `Int` with overflow detection |
 | `bi`  |Calculations in `Big Integer`|
 | `d`  |Calculations in `Double`|
+| `bd`  |Calculations in `BigDecimal`|
 | `p`  |Calculations in `group of Int modulo n`|
 
 Operation in ascending priority:
@@ -61,7 +63,8 @@ Operation in ascending priority:
 * `ADD, SUB`
 * `MUL, DIV`
 * `MOD`
-* All unary and 0-ary operations`CONST, VAR, LB, RB, NEGATE, SQUARE, ABS ...`
+* All unary and 0-ary operations:  
+  `CONST, VAR, LB, RB, NEGATE, SQUARE, ABS ...`
 
 ## Run
 
@@ -80,8 +83,12 @@ Operation in ascending priority:
 `-debug` flag prints an expression with brackets for each operation, which allows you to see how the program parses and
 sets priorities
 
-
 ## Error processing
+
+All exceptions messages are user-friendly and contain the maximum amount of information with highlighted error pos
+
+<details>
+  <summary>Input errors</summary>
 
 ```
 > java -jar math.jar
@@ -104,9 +111,12 @@ hello + bye
 ^==========
 ```
 
-## Parsing errors
+</details>
 
-### Common parse exceptions
+### ParseExceptions
+
+<details>
+  <summary>ParseException</summary>
 
   ``` 
   > java -jar math.jar
@@ -124,7 +134,10 @@ hello + bye
   ==^====
   ```
 
-### MissingLeftBracketException
+</details>
+
+<details>
+  <summary>MissingLeftBracketException</summary>
 
   ``` 
   > java -jar math.jar
@@ -134,8 +147,10 @@ hello + bye
   (x + y     )    )
   ================^
   ```
+</details>
 
-### MissingRightBracketException
+<details>
+  <summary>MissingRightBracketException</summary>
 
   ``` 
   > java -jar math.jar
@@ -145,13 +160,14 @@ hello + bye
   ((1+1)
   ^=====
   ```
+</details>
 
-## Calculate exceptions
+### CalculateExceptions
 
 All calculate exceptions extend ArithmeticException
 
-
-### DivisionByZeroException
+<details>
+  <summary>DivisionByZeroException</summary>
 
 ```
 > java -jar math.jar
@@ -165,8 +181,10 @@ Division by zero. Left = 9999, right = 0.
 x / (abs -5 - 5)
 ==^=============
 ```
+</details>
 
-### ModByZeroException
+<details>
+  <summary>ModByZeroException</summary>
 
 ```
 > java -jar math.jar
@@ -180,8 +198,10 @@ Mod by zero. Left = 0, right = 0.
 x mod (abs -5 - 5)
 ==^===============
 ```
+</details>
 
-### ArithmeticException
+<details>
+  <summary>ArithmeticException</summary>
 
 ```
 > java -jar math.jar
@@ -227,13 +247,14 @@ NumberFormatException while parsing: 1000000000000000000 isn't a Int
 x + 2
 ^====
 ```
+</details>
 
 ## Modding
+
 <details>
   <summary>Operation priority changing</summary>
 
-Suppose you are not satisfied that `mod` priority is higher than `mul`.   
-
+Suppose you are not satisfied that `mod` priority is higher than `mul`.
 ```
 > java -jar math.jar -debug
 10 * 14 mod 5
@@ -245,28 +266,32 @@ i
 but you want `0`. Let's change it.   
 Go to `src/expression/operations/Operation.kt`   
 Find the `operationsByPriority` list:
+
 ```kotlin
 val operationsByPriority = listOf(
-  listOf(ADD, SUB),
-  listOf(MUL, DIV),
-  listOf(MOD),
-  listOf(NEGATE, SQUARE, ABS, CONST, VAR, LB, RB)
+    listOf(ADD, SUB),
+    listOf(MUL, DIV),
+    listOf(MOD),
+    listOf(NEGATE, SQUARE, ABS, CONST, VAR, LB, RB)
 )
 ```
+
 Now the priority of `mod` is equal to its index. Let's change the priority from 3 to 2.
 
 ```kotlin
 val operationsByPriority = listOf(
-  listOf(ADD, SUB),
-  listOf(MUL, DIV, MOD),
-  listOf(NEGATE, SQUARE, ABS, CONST, VAR, LB, RB)
+    listOf(ADD, SUB),
+    listOf(MUL, DIV, MOD),
+    listOf(NEGATE, SQUARE, ABS, CONST, VAR, LB, RB)
 )
 ```
-Now mod has the same priority as `mul` and `div`. Operations with a higher priority are shifted one value lower accordingly.  
+
+Now mod has the same priority as `mul` and `div`. Operations with a higher priority are shifted one value lower
+accordingly.  
 **Warning!** Unary and 0-ary operations must have maximum priority or things won't work as you expect
 
-
 That's all. Let's compile and check this:
+
 ```
 > java -jar math.jar -debug
 10 * 14 mod 5
@@ -275,18 +300,23 @@ Enter mode:
 i
 0
 ```
+
 </details>
 
 <details>
   <summary>New calculating mode adding</summary>
 
-  Suppose that you want a new calculation mode.  
-  For example, let's roll back to [this](https://github.com/Dalvikk/MathExprCalculator/tree/4f43c8a44519124313e689d02714e96d58343874) state when BigDecimal wasn't supported and add it.
-  
-  You can see the diff in [BigDecimal added](https://github.com/Dalvikk/MathExprCalculator/commit/4e0fdf92caebb2d9d90361487d922347ee3cbb22) commit and make sure it's easy.
-  
-  Go to `src/expression/calculators/`  
-  Create calculator what you want, in our case `BigDecimalCalculator`, and inherit it from `Calculate<YOUR_TYPE>`
+Suppose that you want a new calculation mode.  
+For example, let's roll back
+to [this](https://github.com/Dalvikk/MathExprCalculator/tree/4f43c8a44519124313e689d02714e96d58343874) state when
+BigDecimal wasn't supported and add it.
+
+You can see the diff
+in [BigDecimal added](https://github.com/Dalvikk/MathExprCalculator/commit/4e0fdf92caebb2d9d90361487d922347ee3cbb22)
+commit and make sure it's easy.
+
+Go to `src/expression/calculators/`  
+Create calculator what you want, in our case `BigDecimalCalculator`, and inherit it from `Calculate<YOUR_TYPE>`
 
 ```kotlin
 package expression.calculators
@@ -296,7 +326,8 @@ import java.math.BigDecimal
 class BigDecimalCalculator : Calculator<BigDecimal> 
 ```
 
-Implement all methods (if you don't want or cannot support some operation in your calculator, throw `NotImplementedError`):
+Implement all methods (if you don't want or cannot support some operation in your calculator,
+throw `NotImplementedError`):
 
 ```kotlin
 override fun add(x: BigDecimal, y: BigDecimal, wrapper: AbstractNAryOperation): BigDecimal {
@@ -320,7 +351,8 @@ override fun not_implemented(x: BigDecimal, y: BigDecimal, wrapper: AbstractNAry
 ```
 
 Go to `src/expression/Main.kt`  
-Find `CALCULATOR_BY_MODE` map and insert your calculator to match the mode:  
+Find `CALCULATOR_BY_MODE` map and insert your calculator to match the mode:
+
 ```kotlin
 val CALCULATOR_BY_MODE: Map<String, Calculator<*>> = mapOf(
     Pair("bi", BigIntCalculator()),
@@ -333,6 +365,7 @@ val CALCULATOR_BY_MODE: Map<String, Calculator<*>> = mapOf(
 ````
 
 Add small improvements:
+
 ```kotlin
 var res = result.evaluate(map, calculator)
 if (res is BigDecimal) {
@@ -353,8 +386,8 @@ That's all.
   <summary>New prefix unary operation adding [TODO]</summary>
 </details>
 
-
 ## TODO list
+
 * Allow variables to contain numbers, but starts with a letter `a1, an, x2`
 * Add VarConst support (`pi = 3,1415926535` by default, `e = 2.71828182846`, etc)
 * Add Double support to the parser (`0.01, 0.0e-2, 1e+2, Infinity, -Infinity, NaN`)
@@ -362,7 +395,7 @@ That's all.
 * Add postfix unary operations (`!`, `!!`)
 * Add assigment operation and interpreter mode  
   `> S1 = pi * R * l`  
-  `> S2 = pi * R^2  + pi * R * l`   
+  `> S2 = pi * R^2 + pi * R * l`   
   `> l = 5`  
   `> S1 + S2`  
   `Enter mode:`  
