@@ -3,6 +3,8 @@ package expression
 import expression.calculators.*
 import expression.exceptions.ParseException
 import expression.parser.ExpressionParser
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 val CALCULATOR_BY_MODE: Map<String, Calculator<*>> = mapOf(
@@ -10,6 +12,7 @@ val CALCULATOR_BY_MODE: Map<String, Calculator<*>> = mapOf(
     Pair("i", CheckedIntCalculator()),
     Pair("ci", IntCalculator()),
     Pair("d", DoubleCalculator()),
+    Pair("bd", BigDecimalCalculator()),
     Pair("p", ModCalculator())
 )
 
@@ -64,10 +67,14 @@ fun main(args: Array<String>) {
         }
         val calculator: Calculator<*> = readCalculator()
         val map = readVariablesValues(parser)
-        print(result.evaluate(map, calculator))
+        var res = result.evaluate(map, calculator)
+        if (res is BigDecimal) {
+            res = res.setScale(50, RoundingMode.HALF_EVEN)
+        }
+        println(res)
     } catch (e: ParseException) {
-        print(e.message)
+        println(e.message)
     } catch (e: ArithmeticException) {
-        print(e.message)
+        println(e.message)
     }
 }
