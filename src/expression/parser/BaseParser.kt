@@ -53,6 +53,6 @@ abstract class BaseParser(private val source: CharSource) {
     }
 
     protected fun eof(): Boolean {
-        return test(end)
+        return next == end
     }
 }

@@ -154,11 +154,11 @@ hello + bye
 
   ``` 
   > java -jar math.jar
-  ((1+1)
-  Right bracket missing
-  ======
-  ((1+1)
-  ^=====
+((1 + 1		)
+Right bracket missing
+==========
+((1 + 1  )
+==========^
   ```
 </details>
 

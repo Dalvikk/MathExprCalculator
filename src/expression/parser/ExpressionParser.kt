@@ -15,13 +15,22 @@ class ExpressionParser(_expression: String) : BaseParser(StringSource(_expressio
     private var depth = 0
 
     fun parse(): GenericExpression {
-        val result = parseExpression()
+        return parseExpression()
+    }
+
+    private fun parseExpression(): GenericExpression {
+        depth++
+        val result = parseBinaryTerm(0)
         skipWhitespaces()
-        if (eof()) {
-            return result
-        }
-        if (test(Operation.stringByOperator[Operation.RB]!!)) {
-            throw MissingLeftBracketException(expression, readCnt)
+        return if (eof()) {
+            if (depth == 1) result else throw MissingRightBracketException(expression, readCnt + 1)
+        } else if (test(Operation.stringByOperator[Operation.RB]!!)) {
+            if (depth > 1) {
+                depth--
+                result
+            } else {
+                throw MissingLeftBracketException(expression, readCnt)
+            }
         } else {
             throw ParseException(
                 MessageCreator.createHighlightMessage(
@@ -29,11 +38,6 @@ class ExpressionParser(_expression: String) : BaseParser(StringSource(_expressio
                 )
             )
         }
-    }
-
-    private fun parseExpression(): GenericExpression {
-        skipWhitespaces()
-        return parseBinaryTerm(0)
     }
 
     private fun nextTerm(priority: Int): GenericExpression {
@@ -100,16 +104,7 @@ class ExpressionParser(_expression: String) : BaseParser(StringSource(_expressio
             ans = when (operation) {
                 Operation.CONST -> parseConst()
                 Operation.VAR -> parseVariable()
-                Operation.LB -> {
-                    depth++
-                    val result = parseExpression()
-                    skipWhitespaces()
-                    if (!test(')')) {
-                        throw MissingRightBracketException(expression, operationPos)
-                    }
-                    depth--
-                    result
-                }
+                Operation.LB -> parseExpression()
                 Operation.RB -> null
                 Operation.NEGATE -> Negate(parseUnary(), connector)
                 Operation.SQUARE -> Square(parseUnary(), connector)
