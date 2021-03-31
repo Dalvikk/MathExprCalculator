@@ -49,7 +49,17 @@ class BigDecimalCalculator : Calculator<BigDecimal> {
     }
 
     override fun parse(s: String, wrapper: AbstractNAryOperation): BigDecimal {
-        return BigDecimal(s).setScale(50)
+        try {
+            return BigDecimal(s).setScale(50)
+        } catch (ignored: NumberFormatException) {
+            throw ArithmeticException(
+                MessageCreator.createHighlightMessage(
+                    "NumberFormatException while parsing: $s isn't a BigDecimal",
+                    wrapper.getExpression(),
+                    wrapper.getPos()
+                )
+            )
+        }
     }
 
     override fun abs(x: BigDecimal, wrapper: AbstractNAryOperation): BigDecimal {
