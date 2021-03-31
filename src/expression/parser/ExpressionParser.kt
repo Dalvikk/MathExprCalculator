@@ -133,7 +133,7 @@ class ExpressionParser(_expression: String) : BaseParser(StringSource(_expressio
 
     private fun parseVariable(): Variable {
         val sb = StringBuilder()
-        while (Character.isLetter(next)) {
+        while (next.isLetterOrDigit()) {
             sb.append(next)
             pop()
         }

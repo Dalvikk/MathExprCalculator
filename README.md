@@ -35,7 +35,7 @@ Enter n value:
 
 Supported:
 
-* Any variables consisting of letters
+* any variable starting with a letter and containing a letter or number
 * Integer values
 * Overflow checks during evaluating
 * Calculations in various modes
@@ -388,7 +388,6 @@ That's all.
 
 ## TODO list
 
-* Allow variables to contain numbers, but starts with a letter `a1, an, x2`
 * Add VarConst support (`pi = 3,1415926535` by default, `e = 2.71828182846`, etc)
 * Add Double support to the parser (`0.01, 0.0e-2, 1e+2, Infinity, -Infinity, NaN`)
 * More operations
